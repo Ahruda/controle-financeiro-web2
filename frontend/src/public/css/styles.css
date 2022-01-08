@@ -1,0 +1,25 @@
+.card-title {
+  text-align: right;
+}
+
+.card-header {
+  font-size: 1.5rem;
+  padding: 0 0 0 0.5rem;
+}
+
+.card-body {
+  padding: 0.5rem;
+  padding-bottom: 0;
+}
+
+.d-flex {
+  margin: 0;
+}
+
+.row-profit {
+  background-color: #c2ffcc;
+}
+
+.row-expense {
+  background-color: #ffb9b9;
+}
