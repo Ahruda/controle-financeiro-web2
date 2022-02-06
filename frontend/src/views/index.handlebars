@@ -1,9 +1,11 @@
-<div class='row'>
+<div class='row' align="center">
   <h3>Visão Geral</h3>
+  <hr>
 </div>
 
 <div class='row mt-3'>
-  <div class='col-md-3'>
+  <div class="col-md-1"></div>
+  <div class='col-md-2'>
     <div class="mb-3">
       <button class='btn btn-primary' data-bs-toggle="modal" data-bs-target="#modalNovaTransacao">
         Nova Transação
@@ -12,7 +14,7 @@
     <div class='card mb-3 border-success' style='max-width: 18rem;'>
       <div class='card-header'>Entradas</div>
       <div class='card-body'>
-        <h5 class='card-title'>R$ 522,35</h5>
+        <h5 class='card-title'><strong>$ 522,35</strong></h5>
       </div>
     </div>
     <div class='card mb-3 border-danger' style='max-width: 18rem;'>
@@ -31,80 +33,17 @@
   
   <div class='col-md-1'></div>
 
-  <div class='col-md-8'>
-
+  <div class='col-md-7'>
     <div class='card'>
       <div class='card-body'>
         <h4>Tabela de gastos</h4>
-        <table class='table table-bordered'>
-
-          <thead>
-            <tr>
-              <th scope='col'>#</th>
-              <th scope='col'>Título</th>
-              <th scope='col'>Valor</th>
-              <th scope='col'>Categoria</th>
-              <th scope='col'>Data e hora</th>
-              <th scope='col'>Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class='row-profit'>
-              <th scope='row'>1</th>
-              <td>Venda de doces</td>
-              <td>R$ 320,00</td>
-              <td>Comidas</td>
-              <td>08/01/2022 15h30</td>
-              <td>
-                <button class='btn btn-primary'>
-                  <i class="far fa-edit"></i>
-                </button>     
-                <button class='btn btn-primary'>
-                  <i class="far fa-trash-alt"></i>
-                </button>
-              </td>
-            </tr>
-            <tr class='row-expense'>
-              <th scope='row'>2</th>
-              <td>Compra de ingredientes</td>
-              <td>R$ 320,00</td>
-              <td>Comidas</td>
-              <td>08/01/2022 15h30</td>
-            </tr>
-            <tr class='row-profit'>
-              <th scope='row'>3</th>
-              <td>Venda de doces</td>
-              <td>R$ 320,00</td>
-              <td>Comidas</td>
-              <td>08/01/2022 15h30</td>
-            </tr>
-            <tr class='row-profit'>
-              <th scope='row'>4</th>
-              <td>Venda de doces</td>
-              <td>R$ 320,00</td>
-              <td>Comidas</td>
-              <td>08/01/2022 15h30</td>
-            </tr>
-            <tr class='row-expense'>
-              <th scope='row'>5</th>
-              <td>Compra de ingredientes</td>
-              <td>R$ 320,00</td>
-              <td>Comidas</td>
-              <td>08/01/2022 15h30</td>
-            </tr>
-            <tr class='row-profit'>
-              <th scope='row'>6</th>
-              <td>Venda de doces</td>
-              <td>R$ 320,00</td>
-              <td>Comidas</td>
-              <td>08/01/2022 15h30</td>
-            </tr>
-          </tbody>
-        </table>
+        <table class='table table-bordered' id='table'></table>
       </div>
     </div>
-
   </div>
+
+  <div class="col-md-1"></div>
+
 </div>
 
 <!-- Modal nova transacao -->
@@ -116,6 +55,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
+        <input type="hidden" class="form-control" id="id">
         <div class="row">
           <div class="col-md-12">
             <label for="titulo" class="form-label">Título</label>
@@ -123,7 +63,7 @@
           </div>
           <div class="col-md-12">
             <label for="titulo" class="form-label">Valor</label>
-            <input type="number" class="form-control" id="titulo">
+            <input type="number" class="form-control" id="valor">
           </div>
           <div class="col-md-6">
             <label for="data" class="form-label">Data</label>
@@ -135,7 +75,7 @@
           </div>
           <div class="col-md-12">
             <label for="hora" class="form-label">Categoria</label>
-            <select class="form-select" aria-label="Default select example">
+            <select class="form-select" aria-label="Default select example" id="categoria">
               <option selected>Selecione uma categoria....</option>
               <option value="1">Estudos</option>
               <option value="2">Casa</option>
@@ -159,8 +99,126 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
+        <button type="button" class="btn btn-primary" onClick="saveTransaction()">Save changes</button>
       </div>
     </div>
   </div>
 </div>
+
+<script type="text/javascript">
+
+  let request = new XMLHttpRequest()
+
+  getTransactions()
+
+  function getTransactions() {
+    request.open("GET","https://61ffd4d95e1c4100174f6fba.mockapi.io/api/transacao")
+    request.send();
+    request.onload = () => {
+      if(request.status === 200){
+        updateTable(JSON.parse(request.response))        
+      } else {
+        console.log("Page not found")
+      }
+    }
+  }
+
+  function updateTable(data) {
+    let tab = 
+      `<thead>
+      <th>#</th>
+      <th>Título</th>
+      <th>Valor</th>
+      <th>Categoria</th>
+      <th>Data e hora</th>
+      <th>Ações</th>
+      </thead>
+      <tbody>
+      `
+
+    for (let l of data) {
+      tab += `<tr> 
+        <td>${l.id}</td>
+        <td>${l.titulo}</td>
+        <td>${l.valor}</td>
+        <td>${l.categoria}</td>
+        <td>${l.data}</td>
+        <td>              
+          <button class='btn btn-primary'>
+            <i class="far fa-edit"></i>
+          </button>     
+          <button class='btn btn-primary' onClick='deleteTransaction(${l.id})'>
+            <i class="far fa-trash-alt"></i>
+          </button>
+        </td>
+      </tr>`
+    }
+
+    tab += `</tbody>`
+
+    document.getElementById("table").innerHTML = tab;
+  }
+
+  function saveTransaction() {
+    let id = document.getElementById('id').value;
+    let titulo = document.getElementById('titulo').value;
+    let valor = document.getElementById('valor').value;
+    let categoria = document.getElementById('categoria').value;
+    let data = document.getElementById('data').value;
+    
+    let params = 'titulo'+titulo+'&valor='+valor;
+
+    request.open("POST",`https://61ffd4d95e1c4100174f6fba.mockapi.io/api/transacao`)
+    request.send(params);
+    request.onload = () => {
+      if(request.status === 201){
+        getTransactions()
+        Swal.fire(
+          'Inserido com sucesso!',
+          'Sua transação foi inserida',
+          'success'
+        )      
+      } else {
+        Swal.fire(
+          'Ocorreu um erro ao inserir a transação!',
+          'Erro http:' + request.status,
+          'error'
+        )    
+      }
+    }
+  }
+
+  function deleteTransaction(id) {
+    Swal.fire({
+      title: 'Tem certeza que deseja excluir?',
+      text: "Isso não poderá ser desfeito!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sim, excluir transação!'
+    }).then((result) => {
+      if (result.isConfirmed) {    
+        request.open("DELETE",`https://61ffd4d95e1c4100174f6fba.mockapi.io/api/transacao/${id}`)
+        request.send();
+        request.onload = () => {
+          if(request.status === 200){
+            getTransactions()
+            Swal.fire(
+              'Excluido com sucesso!',
+              'Sua transação foi excluida',
+              'success'
+            )      
+          } else {
+            Swal.fire(
+              'Ocorreu um erro ao excluir a transação!',
+              'Erro http:' + request.status,
+              'error'
+            )    
+          }
+        }
+      }
+    })
+  }
+</script>
+

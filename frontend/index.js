@@ -1,5 +1,6 @@
 const express = require('express')
 const expressHandlebars = require('express-handlebars')
+const Swal = require('sweetalert2')
 
 const app = express()
 
@@ -14,6 +15,14 @@ app.set('view engine', 'handlebars')
 
 app.get('/', (req, res) => {
   res.render('index')
+})
+
+app.get('/sobre', (req, res) => {
+  res.render('sobre')
+})
+
+app.get('/contato', (req, res) => {
+  res.render('contato')
 })
 
 const port = 3000
