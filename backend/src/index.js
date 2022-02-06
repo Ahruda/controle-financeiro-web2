@@ -44,6 +44,28 @@ app.post("/transacao", async (req, res) => {
 
 })
 
+app.post("/contato", async (req, res) => {
+
+    const { nome, email, message } = req.body;
+
+    try {
+
+        if (nome && email && email) {
+            const sql = "insert into contact(nome, email, message) values (?, ?, ?)";
+            const valores = [nome, email, message]
+            await query(sql, valores)
+            res.status(201).json({ message: "Cadastrado com sucesso" })
+        } else {
+            res.status(400).json({ message: "Dados incompletos" })
+        }
+
+
+    } catch (err) {
+        res.status(400).json({ message: err })
+    }
+
+})
+
 app.get('/transacao', async (req, res) => {
 
     const transacoes = await query('SELECT * FROM transactions;')
