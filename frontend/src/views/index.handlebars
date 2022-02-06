@@ -4,6 +4,11 @@
 
 <div class='row mt-3'>
   <div class='col-md-3'>
+    <div class="mb-3">
+      <button class='btn btn-primary' data-bs-toggle="modal" data-bs-target="#modalNovaTransacao">
+        Nova Transação
+      </button>
+    </div>
     <div class='card mb-3 border-success' style='max-width: 18rem;'>
       <div class='card-header'>Entradas</div>
       <div class='card-body'>
@@ -23,8 +28,11 @@
       </div>
     </div>
   </div>
+  
   <div class='col-md-1'></div>
+
   <div class='col-md-8'>
+
     <div class='card'>
       <div class='card-body'>
         <h4>Tabela de gastos</h4>
@@ -37,6 +45,7 @@
               <th scope='col'>Valor</th>
               <th scope='col'>Categoria</th>
               <th scope='col'>Data e hora</th>
+              <th scope='col'>Ações</th>
             </tr>
           </thead>
           <tbody>
@@ -46,6 +55,14 @@
               <td>R$ 320,00</td>
               <td>Comidas</td>
               <td>08/01/2022 15h30</td>
+              <td>
+                <button class='btn btn-primary'>
+                  <i class="far fa-edit"></i>
+                </button>     
+                <button class='btn btn-primary'>
+                  <i class="far fa-trash-alt"></i>
+                </button>
+              </td>
             </tr>
             <tr class='row-expense'>
               <th scope='row'>2</th>
@@ -87,5 +104,63 @@
       </div>
     </div>
 
+  </div>
+</div>
+
+<!-- Modal nova transacao -->
+<div class="modal fade" id="modalNovaTransacao" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Nova Transação</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-12">
+            <label for="titulo" class="form-label">Título</label>
+            <input type="text" class="form-control" id="titulo">
+          </div>
+          <div class="col-md-12">
+            <label for="titulo" class="form-label">Valor</label>
+            <input type="number" class="form-control" id="titulo">
+          </div>
+          <div class="col-md-6">
+            <label for="data" class="form-label">Data</label>
+            <input type="date" class="form-control" id="data">
+          </div>
+          <div class="col-md-6">
+            <label for="hora" class="form-label">Hora</label>
+            <input type="time" class="form-control" id="hora">
+          </div>
+          <div class="col-md-12">
+            <label for="hora" class="form-label">Categoria</label>
+            <select class="form-select" aria-label="Default select example">
+              <option selected>Selecione uma categoria....</option>
+              <option value="1">Estudos</option>
+              <option value="2">Casa</option>
+              <option value="3">Viagem</option>
+              <option value="4">Compras</option>
+              <option value="5">Supermercado</option>
+            </select>
+          </div>
+
+          <label class="form-label">Tipo da transação</label>
+          <div class="btn-group">
+            <input type="radio" class="btn-check" name="options" id="option2" autocomplete="off" />
+            <label class="btn btn-outline-success" for="option2">Entrada</label>
+
+            <input type="radio" class="btn-check" name="options" id="option3" autocomplete="off" />
+            <label class="btn btn-outline-danger" for="option3">Saída</label>
+          </div>
+
+          
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
   </div>
 </div>
