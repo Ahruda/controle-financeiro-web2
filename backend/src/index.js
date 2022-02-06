@@ -22,27 +22,67 @@ async function query(sql = '', values = []) {
     return result[0];
 }
 
-app.post("/teste", async (req, res) => {
+app.post("/transacao", async (req, res) => {
 
-    const { nome, email } = req.body;
+    const { titulo, valor, categoria, tipo, data } = req.body;
 
-    const sql = await query("insert into teste(nome, email) values (?, ?)")
-    const valores = [nome, email]
+    try {
 
-    await query(sql, valores)
+        if (titulo && valor && categoria && tipo && data) {
+            const sql = "insert into transactions(titulo, valor, categoria, tipo, datacao) values (?, ?, ?, ?, ?)";
+            const valores = [titulo, valor, categoria, tipo, data]
+            await query(sql, valores)
+            res.status(201).json({ message: "deu certo" })
+        } else {
+            res.status(400).json({ message: "Dados incompletos" })
+        }
 
-    res.status(201).json({ message: "deu certo" })
+
+    } catch (err) {
+        res.status(400).json({ message: err })
+    }
+
 })
 
-app.get('/teste', async (req, res) => {
+app.get('/transacao', async (req, res) => {
 
-    const produtos = await query('SELECT * FROM TESTE;')
+    const transacoes = await query('SELECT * FROM transactions;')
 
-    console.log(produtos)
+    res.json(transacoes);
+})
 
+app.put('/transacao/:id', async (req, res) => {
+
+    const { id } = req.params;
+    const { titulo, valor, categoria, tipo, data } = req.body;
+
+    try {
+        const sql = 'UPDATE transactions SET titulo = ?, valor = ?, categoria = ?, tipo = ?, datacao = ? WHERE id = ?';
+        const valores = [titulo, valor, categoria, tipo, data, id]
+        await query(sql, valores)
+
+        res.json({ message: "Editado com sucesso" })
+    } catch (err) {
+        res.json({ message: err })
+    }
+})
+
+app.delete('/transacao/:id', async (req, res) => {
+
+    const { id } = req.params;
+
+    try {
+        const sql = 'DELETE FROM transactions WHERE id = ?';
+        const valores = [id]
+        await query(sql, valores)
+
+        res.json({ message: "Deletado com sucesso" })
+    } catch (err) {
+        res.json({ message: err })
+    }
     res.json(produtos);
-
 })
+
 
 app.listen(3000, function () {
     console.log("server rodando")
