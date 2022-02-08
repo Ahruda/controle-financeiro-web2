@@ -9,7 +9,7 @@ async function getConnection() {
         host: 'localhost',
         user: 'vinicius',
         password: 'root',
-        database: 'teste'
+        database: 'transactions'
     });
     return connection;
 }
