@@ -14,19 +14,19 @@
     <div class='card mb-3 border-success' style='max-width: 18rem;'>
       <div class='card-header'>Entradas</div>
       <div class='card-body'>
-        <h5 class='card-title'><strong>$ 522,35</strong></h5>
+        <h5 class='card-title'><strong id='entrada'></strong></h5>
       </div>
     </div>
     <div class='card mb-3 border-danger' style='max-width: 18rem;'>
       <div class='card-header'>Saídas</div>
       <div class='card-body'>
-        <h5 class='card-title'>R$ 522,35</h5>
+        <h5 class='card-title'><strong id='saida'></strong></h5>
       </div>
     </div>
     <div class='card mb-3 border-primary' style='max-width: 18rem;'>
       <div class='card-header'>Total</div>
       <div class='card-body'>
-        <h5 class='card-title'>R$ 522,35</h5>
+        <h5 class='card-title'><strong id='total'></strong></h5>
       </div>
     </div>
   </div>
@@ -63,7 +63,7 @@
           </div>
           <div class="col-md-12">
             <label for="titulo" class="form-label">Valor</label>
-            <input type="number" class="form-control" id="valor">
+            <input type="text" class="form-control" id="valor">
           </div>
           <div class="col-md-6">
             <label for="data" class="form-label">Data</label>
@@ -124,6 +124,9 @@
   }
 
   function updateTable(data) {
+    let entrada = 0
+    let saida = 0
+
     let tab = 
       `<thead>
       <th>#</th>
@@ -144,7 +147,7 @@
         <td>${l.categoria}</td>
         <td>${l.data}</td>
         <td>              
-          <button class='btn btn-primary'>
+          <button class='btn btn-primary' onClick='updateTransaction(${l.id})'>
             <i class="far fa-edit"></i>
           </button>     
           <button class='btn btn-primary' onClick='deleteTransaction(${l.id})'>
@@ -152,21 +155,37 @@
           </button>
         </td>
       </tr>`
+    
+      if(l.tipo == 1) {
+        entrada += parseFloat(l.valor)
+      } else {
+        saida += parseFloat(l.valor)
+      }
+
     }
 
     tab += `</tbody>`
 
-    document.getElementById("table").innerHTML = tab;
+    document.getElementById("table").innerHTML = tab
+    document.getElementById("entrada").innerHTML = 'R$ ' + entrada.toFixed(2)
+    document.getElementById("saida").innerHTML = 'R$ ' + saida.toFixed(2)
+    document.getElementById("total").innerHTML = 'R$ ' + (entrada+saida).toFixed(2)
+    pesquisarTransacao()
   }
 
   function saveTransaction() {
-    let id = document.getElementById('id').value;
-    let titulo = document.getElementById('titulo').value;
-    let valor = document.getElementById('valor').value;
-    let categoria = document.getElementById('categoria').value;
-    let data = document.getElementById('data').value;
-    
-    let params = 'titulo'+titulo+'&valor='+valor;
+    let id = document.getElementById('id').value
+    let titulo = document.getElementById('titulo').value
+    let valor = document.getElementById('valor').value
+    let categoria = document.getElementById('categoria').value
+    let data = document.getElementById('data').value
+
+    valor = valor.replace(".", "")
+    valor = valor.replace(",", ".")
+    valor = valor.replace("R$", "")
+    valor = parseFloat(valor)
+
+    let params = 'titulo'+titulo+'&valor='+valor
 
     request.open("POST",`https://61ffd4d95e1c4100174f6fba.mockapi.io/api/transacao`)
     request.send(params);
@@ -220,5 +239,34 @@
       }
     })
   }
+
+  // Masking input element to money with options.
+  VMasker(document.getElementById("valor")).maskMoney({
+    unit: 'R$'
+  });
+
+  let filtro = document.getElementById('campoPesquisa');
+  let tabela = document.getElementById('table');
+  let botao = document.getElementById('botao-pesquisa');
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const pesquisa = urlParams.get('pesquisa');
+
+  filtro.addEventListener("keyup", pesquisarTransacao);
+  
+  function pesquisarTransacao() {
+    console.log('entrou')
+      let nomeFiltro = filtro.value;
+      for (var i = 1; i < tabela.rows.length; i++) {
+          var conteudoCelula = tabela.rows[i].cells[1].innerText;
+          var corresponde = conteudoCelula.toLowerCase().indexOf(nomeFiltro) >= 0;
+          tabela.rows[i].style.display = corresponde ? '' : 'none';
+      }
+  };
+
+  if(pesquisa != null){
+      filtro.value = pesquisa
+  }
+
 </script>
 
