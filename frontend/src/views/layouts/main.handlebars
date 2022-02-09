@@ -8,7 +8,8 @@
     <link rel='stylesheet' href='/css/bootstrap.min.css' />
     <link rel='stylesheet' href='/css/styles.css' />
     <link rel="stylesheet" href="sweetAlert/src/sweetalert2.scss">
-    
+    <script src="/js/vanilla-masker.js"></script>
+
     <title>Lista 01 de Programação para Web 2</title>
   </head>
 
@@ -42,14 +43,16 @@
               <a class='nav-link' href='#'>Sair</a>
             </li>
           </ul>
-          <form class='d-flex'>
+          <form class='d-flex' method='get' action='/'>
             <input
               class='form-control me-2'
-              type='search'
+              type='text'
+              id="campoPesquisa"
+              name="pesquisa"
               placeholder='Pesquisar'
               aria-label='Search'
             />
-            <button class='btn btn-success' type='submit'>
+            <button class='btn btn-success' type='submit' id="botao-pesquisa">
               <i class='fas fa-search'></i>
             </button>
           </form>

@@ -1,6 +1,5 @@
 const express = require('express')
 const expressHandlebars = require('express-handlebars')
-const Swal = require('sweetalert2')
 
 const app = express()
 
@@ -25,7 +24,7 @@ app.get('/contato', (req, res) => {
   res.render('contato')
 })
 
-const port = 3000
-app.listen(3000, () => {
+const port = 3001
+app.listen(port, () => {
   console.log('O servidor está atuando na porta ' + port)
 })
