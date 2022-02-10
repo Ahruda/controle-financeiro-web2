@@ -26,15 +26,15 @@ async function query(sql = '', values = []) {
 
 app.post("/transacao", async (req, res) => {
 
-    const { titulo, valor, categoria, tipo, data } = req.body;
+    const { titulo, valor, categoria, tipo, data, hora } = req.body;
 
     try {
 
         if (titulo && valor && categoria && tipo && data) {
-            const sql = "insert into transactions(titulo, valor, categoria, tipo, datacao) values (?, ?, ?, ?, ?)";
-            const valores = [titulo, valor, categoria, tipo, data]
+            const sql = "insert into transactions(titulo, valor, categoria, tipo, datacao, hora) values (?, ?, ?, ?, ?, ?)";
+            const valores = [titulo, valor, categoria, tipo, data, hora]
             await query(sql, valores)
-            res.status(201).json({ message: "deu certo" })
+            res.status(201).json({ message: "Dados cadastrados com sucesso!" })
         } else {
             res.status(400).json({ message: "Dados incompletos" })
         }
@@ -86,11 +86,11 @@ app.get('/transacao/:id', async (req, res) => {
 app.put('/transacao/:id', async (req, res) => {
 
     const { id } = req.params;
-    const { titulo, valor, categoria, tipo, data } = req.body;
+    const { titulo, valor, categoria, tipo, data, hora } = req.body;
 
     try {
-        const sql = 'UPDATE transactions SET titulo = ?, valor = ?, categoria = ?, tipo = ?, datacao = ? WHERE id = ?';
-        const valores = [titulo, valor, categoria, tipo, data, id]
+        const sql = 'UPDATE transactions SET titulo = ?, valor = ?, categoria = ?, tipo = ?, datacao = ?, hora = ? WHERE id = ?';
+        const valores = [titulo, valor, categoria, tipo, data, id, hora]
         await query(sql, valores)
 
         res.json({ message: "Editado com sucesso" })
@@ -116,5 +116,5 @@ app.delete('/transacao/:id', async (req, res) => {
 
 
 app.listen(3000, function () {
-    console.log("server rodando")
+    console.log("server rodando na porta 3000.");
 })
