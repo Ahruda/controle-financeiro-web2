@@ -170,16 +170,19 @@
       }
 
       if(l.tipo == 1) {
-        tipo = 'Entrada'
+        tipo = '<span style="color: green">Entrada</span>'
       } else {
-        tipo = 'Saída'
+        tipo = '<span style="color: red">Saída</span>'
       }
+      
+      let valor = l.valor.toString()
+
 
       tab += `<tr> 
         <td>${l.id}</td>
         <td>${l.titulo}</td>
         <td>${tipo}</td>
-        <td>${l.valor}</td>
+        <td>R$ ${VMasker.toMoney(l.valor)}</td>
         <td>${categoria}</td>
         <td>${l.datacao}</td>
         <td>${l.datacao}</td>
@@ -229,6 +232,7 @@
     if(optionSaida){
       tipo = 2;
     }
+
 
     valor = valor.replace(".", "")
     valor = valor.replace(",", ".")
@@ -312,7 +316,7 @@
         response = JSON.parse(request.response)[0]
         document.getElementById('id').value = response.id
         document.getElementById('titulo').value = response.titulo
-        document.getElementById('valor').value = response.valor
+        document.getElementById('valor').value = `R$ ${VMasker.toMoney(response.valor)}`
         document.getElementById('categoria').value = response.categoria
         document.getElementById('data').value = response.datacao
         

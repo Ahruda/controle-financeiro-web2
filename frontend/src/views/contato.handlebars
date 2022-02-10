@@ -12,26 +12,86 @@
         <div class="card-header">
           Formulário
         </div>
-        <div class="card-body">
-          <h5 class="card-title">Escreva aqui sua mensagem</h5>
-          <p class="card-text">
-            <div class="input-group mb-3">
-              <span class="input-group-text" id="basic-addon1">Nome</span>
-              <input type="text" class="form-control" aria-label="Username" aria-describedby="basic-addon1">
-            </div>
-            <div class="input-group mb-3">
-              <span class="input-group-text" id="basic-addon1">E-mail</span>
-              <input type="email" class="form-control" aria-label="Username" aria-describedby="basic-addon1">
-            </div>
-            <div class="input-group">
-              <span class="input-group-text">Mensagem</span>
-              <textarea class="form-control" aria-label="With textarea"></textarea>
-            </div>
-          </p>
-          <button class="btn btn-primary">Enviar mensagem</button>
-        </div>
+        <form id="form">
+          <div class="card-body">
+            <h5 class="card-title">Escreva aqui sua mensagem</h5>
+            <p class="card-text">
+              <div class="input-group mb-3">
+                <span class="input-group-text" id="basic-addon1">Nome</span>
+                <input type="text" class="form-control" id="nome" aria-label="Username" aria-describedby="basic-addon1" required>
+              </div>
+              <div class="input-group mb-3">
+                <span class="input-group-text" id="basic-addon1">E-mail</span>
+                <input type="email" class="form-control" id="email" aria-label="Username" aria-describedby="basic-addon1" required>
+              </div>
+              <div class="input-group">
+                <span class="input-group-text">Mensagem</span>
+                <textarea class="form-control" id="mensagem" required></textarea>
+              </div>
+            </p>
+            <button class="btn btn-primary" type="button" onclick="save()">Enviar mensagem</button>
+          </div>
+        </form>
       </div>
     </div>
 
   <div class="col-md-1"></div>
 </div>
+
+<script>
+  
+  let request = new XMLHttpRequest()
+
+  function save() {
+    let nome = document.getElementById('nome').value
+    let email = document.getElementById('email').value
+    let mensagem = document.getElementById('mensagem').value
+
+    if(nome === '') {
+      Swal.fire(
+        'Campo nome é obrigatório',
+        'Preencha-o antes de enviar sua mensagem',
+        'error'
+      )    
+    } else if(email === '') {
+      Swal.fire(
+        'Campo e-mail é obrigatório',
+        'Preencha-o antes de enviar sua mensagem',
+        'error'
+      )  
+    } else if(mensagem === '') {
+      Swal.fire(
+        'Campo mensagem é obrigatório',
+        'Preencha-o antes de enviar sua mensagem',
+        'error'
+      )  
+    } else {
+      request.open("POST",`http://localhost:3000/contato`)
+      const params = {
+        nome: nome,
+        email: email,
+        message: mensagem
+      }
+
+      request.setRequestHeader('Content-type', 'application/json')
+      request.send(JSON.stringify(params)) // Make sure to stringify
+      request.onload = () => {
+        if(request.status === 201) {
+          document.getElementById("form").reset();
+          Swal.fire(
+            'Enviada com sucesso!',
+            'Sua mensagem foi enviada com sucesso',
+            'success'
+          )      
+        } else {
+          Swal.fire(
+            'Ocorreu um erro ao enviar sua mensagem!',
+            'Erro http:' + request.status,
+            'error'
+          )    
+        }
+      }
+    }
+  }
+
+</script>
