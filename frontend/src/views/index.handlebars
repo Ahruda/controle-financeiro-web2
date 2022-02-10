@@ -7,7 +7,7 @@
   <div class="col-md-1"></div>
   <div class='col-md-2'>
     <div class="mb-3">
-      <button class='btn btn-primary' data-bs-toggle="modal" data-bs-target="#modalNovaTransacao">
+      <button class='btn btn-primary' data-bs-toggle="modal" onclick="openModal()">
         Nova Transação
       </button>
     </div>
@@ -55,51 +55,52 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <input type="hidden" class="form-control" id="id">
-        <div class="row">
-          <div class="col-md-12">
-            <label for="titulo" class="form-label">Título</label>
-            <input type="text" class="form-control" id="titulo">
-          </div>
-          <div class="col-md-12">
-            <label for="titulo" class="form-label">Valor</label>
-            <input type="text" class="form-control" id="valor">
-          </div>
-          <div class="col-md-6">
-            <label for="data" class="form-label">Data</label>
-            <input type="date" class="form-control" id="data">
-          </div>
-          <div class="col-md-6">
-            <label for="hora" class="form-label">Hora</label>
-            <input type="time" class="form-control" id="hora">
-          </div>
-          <div class="col-md-12">
-            <label for="hora" class="form-label">Categoria</label>
-            <select class="form-select" aria-label="Default select example" id="categoria">
-              <option selected>Selecione uma categoria....</option>
-              <option value="1">Estudos</option>
-              <option value="2">Casa</option>
-              <option value="3">Viagem</option>
-              <option value="4">Compras</option>
-              <option value="5">Supermercado</option>
-            </select>
-          </div>
+        <form id="form">
+          <input type="hidden" class="form-control" id="id">
+          <div class="row">
+            <div class="col-md-12">
+              <label for="titulo" class="form-label">Título</label>
+              <input type="text" class="form-control" id="titulo">
+            </div>
+            <div class="col-md-12">
+              <label for="titulo" class="form-label">Valor</label>
+              <input type="text" class="form-control" id="valor">
+            </div>
+            <div class="col-md-6">
+              <label for="data" class="form-label">Data</label>
+              <input type="text" class="form-control" id="data">
+            </div>
+            <div class="col-md-6">
+              <label for="hora" class="form-label">Hora</label>
+              <input type="time" class="form-control" id="hora">
+            </div>
+            <div class="col-md-12">
+              <label for="hora" class="form-label">Categoria</label>
+              <select class="form-select" aria-label="Default select example" id="categoria">
+                <option value="1">Estudos</option>
+                <option value="2">Casa</option>
+                <option value="3">Viagem</option>
+                <option value="4">Compras</option>
+                <option value="5">Supermercado</option>
+              </select>
+            </div>
 
-          <label class="form-label">Tipo da transação</label>
-          <div class="btn-group">
-            <input type="radio" class="btn-check" name="options" id="option2" autocomplete="off" />
-            <label class="btn btn-outline-success" for="option2">Entrada</label>
+            <label class="form-label">Tipo da transação</label>
+            <div class="btn-group">
+              <input type="radio" class="btn-check" name="options" id="optionEntrada" autocomplete="off" />
+              <label class="btn btn-outline-success" for="optionEntrada">Entrada</label>
 
-            <input type="radio" class="btn-check" name="options" id="option3" autocomplete="off" />
-            <label class="btn btn-outline-danger" for="option3">Saída</label>
+              <input type="radio" class="btn-check" name="options" id="optionSaida" autocomplete="off" />
+              <label class="btn btn-outline-danger" for="optionSaida">Saída</label>
+            </div>
+
+            
           </div>
-
-          
         </div>
-      </div>
+      </form>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" onClick="saveTransaction()">Save changes</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-primary" onClick="saveTransaction()">Salvar transação</button>
       </div>
     </div>
   </div>
@@ -111,8 +112,14 @@
 
   getTransactions()
 
+  function openModal() {
+    document.getElementById("form").reset();
+    new bootstrap.Modal(document.getElementById('modalNovaTransacao')).show()
+  }
+
   function getTransactions() {
-    request.open("GET","https://61ffd4d95e1c4100174f6fba.mockapi.io/api/transacao")
+
+    request.open("GET","http://localhost:3000/transacao")
     request.send();
     request.onload = () => {
       if(request.status === 200){
@@ -131,23 +138,53 @@
       `<thead>
       <th>#</th>
       <th>Título</th>
+      <th>Tipo</th>
       <th>Valor</th>
       <th>Categoria</th>
-      <th>Data e hora</th>
+      <th>Data</th>
+      <th>Hora</th>
       <th>Ações</th>
       </thead>
       <tbody>
       `
-
+    
     for (let l of data) {
+
+      let categoria
+      switch (parseInt(l.categoria)) {
+        case 1:
+          categoria = 'Estudos'
+          break
+        case 2:
+          categoria = 'Casa'
+          break
+        case 3:
+          categoria = 'Viagem'
+          break
+        case 4:
+          categoria = 'Compras'
+          break
+        case 5:
+          categoria = 'Supermercado'
+          break
+      }
+
+      if(l.tipo == 1) {
+        tipo = 'Entrada'
+      } else {
+        tipo = 'Saída'
+      }
+
       tab += `<tr> 
         <td>${l.id}</td>
         <td>${l.titulo}</td>
+        <td>${tipo}</td>
         <td>${l.valor}</td>
-        <td>${l.categoria}</td>
-        <td>${l.data}</td>
+        <td>${categoria}</td>
+        <td>${l.datacao}</td>
+        <td>${l.datacao}</td>
         <td>              
-          <button class='btn btn-primary' onClick='updateTransaction(${l.id})'>
+          <button class='btn btn-primary' onClick='modalUpdateTransaction(${l.id})'>
             <i class="far fa-edit"></i>
           </button>     
           <button class='btn btn-primary' onClick='deleteTransaction(${l.id})'>
@@ -169,7 +206,7 @@
     document.getElementById("table").innerHTML = tab
     document.getElementById("entrada").innerHTML = 'R$ ' + entrada.toFixed(2)
     document.getElementById("saida").innerHTML = 'R$ ' + saida.toFixed(2)
-    document.getElementById("total").innerHTML = 'R$ ' + (entrada+saida).toFixed(2)
+    document.getElementById("total").innerHTML = 'R$ ' + (entrada-saida).toFixed(2)
     pesquisarTransacao()
   }
 
@@ -179,21 +216,45 @@
     let valor = document.getElementById('valor').value
     let categoria = document.getElementById('categoria').value
     let data = document.getElementById('data').value
+    let tipo = 1
+
+    if(id === '') {
+      request.open("POST",`http://localhost:3000/transacao`)
+    }else{
+      request.open("PUT",`http://localhost:3000/transacao/${id}`)
+    }
+
+    let optionSaida = document.getElementById('optionSaida').checked
+
+    if(optionSaida){
+      tipo = 2;
+    }
 
     valor = valor.replace(".", "")
     valor = valor.replace(",", ".")
     valor = valor.replace("R$", "")
     valor = parseFloat(valor)
 
-    let params = 'titulo'+titulo+'&valor='+valor
+    const params = {
+      titulo: titulo,
+      valor: valor,
+      categoria: categoria,
+      tipo: tipo,
+      data: data
+    }
 
-    request.open("POST",`https://61ffd4d95e1c4100174f6fba.mockapi.io/api/transacao`)
-    request.send(params);
+    request.setRequestHeader('Content-type', 'application/json')
+    request.send(JSON.stringify(params)) // Make sure to stringify
     request.onload = () => {
-      if(request.status === 201){
-        getTransactions()
+      if(request.status === 200){
         Swal.fire(
-          'Inserido com sucesso!',
+          'Transação alterada com sucesso!',
+          'Sua transação foi alterada',
+          'success'
+        )      
+      } else if(request.status === 201) {
+        Swal.fire(
+          'Inserida com sucesso!',
           'Sua transação foi inserida',
           'success'
         )      
@@ -204,6 +265,7 @@
           'error'
         )    
       }
+      getTransactions()
     }
   }
 
@@ -218,7 +280,7 @@
       confirmButtonText: 'Sim, excluir transação!'
     }).then((result) => {
       if (result.isConfirmed) {    
-        request.open("DELETE",`https://61ffd4d95e1c4100174f6fba.mockapi.io/api/transacao/${id}`)
+        request.open("DELETE",`http://localhost:3000/transacao/${id}`)
         request.send();
         request.onload = () => {
           if(request.status === 200){
@@ -240,10 +302,38 @@
     })
   }
 
+  function modalUpdateTransaction(id) {
+    document.getElementById("form").reset();
+    let response
+    request.open("GET",`http://localhost:3000/transacao/${id}`)
+    request.send();
+    request.onload = () => {
+      if(request.status === 200){
+        response = JSON.parse(request.response)[0]
+        document.getElementById('id').value = response.id
+        document.getElementById('titulo').value = response.titulo
+        document.getElementById('valor').value = response.valor
+        document.getElementById('categoria').value = response.categoria
+        document.getElementById('data').value = response.datacao
+        
+        if(response.tipo == 1) {
+          document.getElementById('optionEntrada').checked = true
+        } else {
+          document.getElementById('optionSaida').checked = true
+        }
+      }
+    }
+    new bootstrap.Modal(document.getElementById('modalNovaTransacao')).show()
+
+  }
+
   // Masking input element to money with options.
   VMasker(document.getElementById("valor")).maskMoney({
     unit: 'R$'
   });
+
+  VMasker(document.getElementById("data")).maskPattern("99/99/9999")
+  
 
   let filtro = document.getElementById('campoPesquisa');
   let tabela = document.getElementById('table');
