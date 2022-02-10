@@ -9,7 +9,7 @@ app.use(cors());
 async function getConnection() {
     const connection = await mysql.createConnection({
         host: 'localhost',
-        user: 'vinicius',
+        user: 'root',
         password: 'root',
         database: 'transactions'
     });
@@ -75,6 +75,14 @@ app.get('/transacao', async (req, res) => {
     res.json(transacoes);
 })
 
+
+app.get('/transacao/:id', async (req, res) => {
+    const { id } = req.params;
+    const transacoes = await query('SELECT * FROM transactions where id = ' + id)
+
+    res.json(transacoes);
+})
+
 app.put('/transacao/:id', async (req, res) => {
 
     const { id } = req.params;
@@ -104,7 +112,6 @@ app.delete('/transacao/:id', async (req, res) => {
     } catch (err) {
         res.json({ message: err })
     }
-    res.json(produtos);
 })
 
 
