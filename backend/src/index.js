@@ -75,6 +75,13 @@ app.get('/transacao', async (req, res) => {
     res.json(transacoes);
 })
 
+app.get('/categoria', async (req, res) => {
+
+    const categorias = await query('SELECT * FROM categorias;')
+
+    res.json(categorias);
+})
+
 
 app.get('/transacao/:id', async (req, res) => {
     const { id } = req.params;
