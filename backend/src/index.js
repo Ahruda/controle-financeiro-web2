@@ -90,9 +90,10 @@ app.put('/transacao/:id', async (req, res) => {
 
     try {
         const sql = 'UPDATE transactions SET titulo = ?, valor = ?, categoria = ?, tipo = ?, datacao = ?, hora = ? WHERE id = ?';
-        const valores = [titulo, valor, categoria, tipo, data, id, hora]
+        const valores = [titulo, valor, categoria, tipo, data, hora, id]
+		console.log(valores)
         await query(sql, valores)
-
+		
         res.json({ message: "Editado com sucesso" })
     } catch (err) {
         res.json({ message: err })

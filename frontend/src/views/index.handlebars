@@ -114,6 +114,7 @@
 
   function openModal() {
     document.getElementById("form").reset();
+    document.getElementById('id').value = ''
     new bootstrap.Modal(document.getElementById('modalNovaTransacao')).show()
   }
 
@@ -175,17 +176,18 @@
         tipo = '<span style="color: red">Saída</span>'
       }
       
-      let valor = l.valor.toString()
-
+      let valor = l.valor.toFixed(2).toString()
+      valor = valor.replace(".", ",")
+      
 
       tab += `<tr> 
         <td>${l.id}</td>
         <td>${l.titulo}</td>
         <td>${tipo}</td>
-        <td>R$ ${VMasker.toMoney(l.valor)}</td>
+        <td>R$ ${valor}</td>
         <td>${categoria}</td>
         <td>${l.datacao}</td>
-        <td>${l.datacao}</td>
+        <td>${l.hora}</td>
         <td>              
           <button class='btn btn-primary' onClick='modalUpdateTransaction(${l.id})'>
             <i class="far fa-edit"></i>
@@ -207,9 +209,9 @@
     tab += `</tbody>`
 
     document.getElementById("table").innerHTML = tab
-    document.getElementById("entrada").innerHTML = 'R$ ' + entrada.toFixed(2)
-    document.getElementById("saida").innerHTML = 'R$ ' + saida.toFixed(2)
-    document.getElementById("total").innerHTML = 'R$ ' + (entrada-saida).toFixed(2)
+    document.getElementById("entrada").innerHTML = 'R$ ' + entrada.toFixed(2).replace(".", ",")
+    document.getElementById("saida").innerHTML = 'R$ ' + saida.toFixed(2).replace(".", ",")
+    document.getElementById("total").innerHTML = 'R$ ' + (entrada-saida).toFixed(2).replace(".", ",")
     pesquisarTransacao()
   }
 
@@ -219,57 +221,86 @@
     let valor = document.getElementById('valor').value
     let categoria = document.getElementById('categoria').value
     let data = document.getElementById('data').value
+    let hora = document.getElementById('hora').value
     let tipo = 1
 
-    if(id === '') {
-      request.open("POST",`http://localhost:3000/transacao`)
-    }else{
-      request.open("PUT",`http://localhost:3000/transacao/${id}`)
-    }
+    if(titulo === '') {
+      Swal.fire(
+        'Campo titulo é obrigatório',
+        'Preencha-o antes de enviar sua mensagem',
+        'error'
+      )    
+    } else if(valor === '') {
+      Swal.fire(
+        'Campo valor é obrigatório',
+        'Preencha-o antes de enviar sua mensagem',
+        'error'
+      )  
+    } else if(data === '') {
+      Swal.fire(
+        'Campo data é obrigatório',
+        'Preencha-o antes de enviar sua mensagem',
+        'error'
+      )
+     } else if(hora === '') {
+      Swal.fire(
+        'Campo hora é obrigatório',
+        'Preencha-o antes de enviar sua mensagem',
+        'error'
+      )      
+    } else {
 
-    let optionSaida = document.getElementById('optionSaida').checked
-
-    if(optionSaida){
-      tipo = 2;
-    }
-
-
-    valor = valor.replace(".", "")
-    valor = valor.replace(",", ".")
-    valor = valor.replace("R$", "")
-    valor = parseFloat(valor)
-
-    const params = {
-      titulo: titulo,
-      valor: valor,
-      categoria: categoria,
-      tipo: tipo,
-      data: data
-    }
-
-    request.setRequestHeader('Content-type', 'application/json')
-    request.send(JSON.stringify(params)) // Make sure to stringify
-    request.onload = () => {
-      if(request.status === 200){
-        Swal.fire(
-          'Transação alterada com sucesso!',
-          'Sua transação foi alterada',
-          'success'
-        )      
-      } else if(request.status === 201) {
-        Swal.fire(
-          'Inserida com sucesso!',
-          'Sua transação foi inserida',
-          'success'
-        )      
-      } else {
-        Swal.fire(
-          'Ocorreu um erro ao inserir a transação!',
-          'Erro http:' + request.status,
-          'error'
-        )    
+      if(id === '') {
+        request.open("POST",`http://localhost:3000/transacao`)
+      }else{
+        request.open("PUT",`http://localhost:3000/transacao/${id}`)
       }
-      getTransactions()
+
+      let optionSaida = document.getElementById('optionSaida').checked
+
+      if(optionSaida){
+        tipo = 2;
+      }
+
+
+      valor = valor.replace(".", "")
+      valor = valor.replace(",", ".")
+      valor = valor.replace("R$", "")
+      valor = parseFloat(valor)
+
+      const params = {
+        titulo: titulo,
+        valor: valor,
+        categoria: categoria,
+        tipo: tipo,
+        data: data,
+        hora: hora
+      }
+
+      request.setRequestHeader('Content-type', 'application/json')
+      request.send(JSON.stringify(params)) // Make sure to stringify
+      request.onload = () => {
+        if(request.status === 200){
+          Swal.fire(
+            'Transação alterada com sucesso!',
+            'Sua transação foi alterada',
+            'success'
+          )      
+        } else if(request.status === 201) {
+          Swal.fire(
+            'Inserida com sucesso!',
+            'Sua transação foi inserida',
+            'success'
+          )      
+        } else {
+          Swal.fire(
+            'Ocorreu um erro ao inserir a transação!',
+            'Erro http:' + request.status,
+            'error'
+          )    
+        }
+        getTransactions()
+      }
     }
   }
 
@@ -308,6 +339,7 @@
 
   function modalUpdateTransaction(id) {
     document.getElementById("form").reset();
+    document.getElementById('id').value = ''
     let response
     request.open("GET",`http://localhost:3000/transacao/${id}`)
     request.send();
@@ -316,9 +348,10 @@
         response = JSON.parse(request.response)[0]
         document.getElementById('id').value = response.id
         document.getElementById('titulo').value = response.titulo
-        document.getElementById('valor').value = `R$ ${VMasker.toMoney(response.valor)}`
+        document.getElementById('valor').value = `R$ ${response.valor.toFixed(2).replace(".", ",")}`
         document.getElementById('categoria').value = response.categoria
         document.getElementById('data').value = response.datacao
+        document.getElementById('hora').value = response.hora
         
         if(response.tipo == 1) {
           document.getElementById('optionEntrada').checked = true
