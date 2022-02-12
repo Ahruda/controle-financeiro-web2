@@ -26,13 +26,13 @@ async function query(sql = '', values = []) {
 
 app.post("/transacao", async (req, res) => {
 
-    const { titulo, valor, categoria, tipo, data, hora } = req.body;
+    const { titulo, valor, categoria_id, tipo, data, hora } = req.body;
 
     try {
 
-        if (titulo && valor && categoria && tipo && data) {
-            const sql = "insert into transactions(titulo, valor, categoria, tipo, datacao, hora) values (?, ?, ?, ?, ?, ?)";
-            const valores = [titulo, valor, categoria, tipo, data, hora]
+        if (titulo && valor && categoria_id && tipo && data) {
+            const sql = "insert into transactions(titulo, valor, categoria_id, tipo, datacao, hora) values (?, ?, ?, ?, ?, ?)";
+            const valores = [titulo, valor, categoria_id, tipo, data, hora]
             await query(sql, valores)
             res.status(201).json({ message: "Dados cadastrados com sucesso!" })
         } else {
@@ -77,11 +77,17 @@ app.get('/transacao', async (req, res) => {
 
 app.get('/categoria', async (req, res) => {
 
-    const categorias = await query('SELECT * FROM categorias;')
+    const categorias = await query('SELECT * FROM categories;')
 
     res.json(categorias);
 })
 
+app.get('/categoria/:id', async (req, res) => {
+    const { id } = req.params;
+    const categoria = await query('SELECT * FROM categories where id = ' + id)
+
+    res.json(categoria);
+})
 
 app.get('/transacao/:id', async (req, res) => {
     const { id } = req.params;
@@ -93,12 +99,12 @@ app.get('/transacao/:id', async (req, res) => {
 app.put('/transacao/:id', async (req, res) => {
 
     const { id } = req.params;
-    const { titulo, valor, categoria, tipo, data, hora } = req.body;
+    const { titulo, valor, categoria_id, tipo, data, hora } = req.body;
 
     try {
-        const sql = 'UPDATE transactions SET titulo = ?, valor = ?, categoria = ?, tipo = ?, datacao = ?, hora = ? WHERE id = ?';
-        const valores = [titulo, valor, categoria, tipo, data, hora, id]
-		console.log(valores)
+        const sql = 'UPDATE transactions SET titulo = ?, valor = ?, categoria_id = ?, tipo = ?, datacao = ?, hora = ? WHERE id = ?';
+        const valores = [titulo, valor, categoria_id, tipo, data, hora, id]
+	
         await query(sql, valores)
 		
         res.json({ message: "Editado com sucesso" })

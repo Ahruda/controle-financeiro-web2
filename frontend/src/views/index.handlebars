@@ -77,11 +77,7 @@
             <div class="col-md-12">
               <label for="hora" class="form-label">Categoria</label>
               <select class="form-select" aria-label="Default select example" id="categoria">
-                <option value="1">Estudos</option>
-                <option value="2">Casa</option>
-                <option value="3">Viagem</option>
-                <option value="4">Compras</option>
-                <option value="5">Supermercado</option>
+
               </select>
             </div>
 
@@ -112,6 +108,23 @@
 
   getTransactions()
 
+  window.onload = function() {
+    request.open("GET","http://localhost:3000/categoria")
+    request.send();
+    request.onload = () => {
+      if(request.status === 200){
+        const select = document.getElementById('categoria');
+        let response = JSON.parse(request.response)
+        for (let l of response) {
+            let opt = document.createElement('option');
+            opt.value = l.id;
+            opt.innerHTML = l.titulo;
+            select.appendChild(opt);
+        }
+      }
+    }
+  }
+
   function openModal() {
     document.getElementById("form").reset();
     document.getElementById('id').value = ''
@@ -126,15 +139,13 @@
       if(request.status === 200){
         updateTable(JSON.parse(request.response))        
       } else {
-        console.log("Page not found")
       }
     }
   }
 
-  function updateTable(data) {
+   function updateTable(data) {
     let entrada = 0
     let saida = 0
-
     let tab = 
       `<thead>
       <th>#</th>
@@ -150,9 +161,8 @@
       `
     
     for (let l of data) {
-
       let categoria
-      switch (parseInt(l.categoria)) {
+      switch (parseInt(l.categoria_id)) {
         case 1:
           categoria = 'Estudos'
           break
@@ -169,7 +179,6 @@
           categoria = 'Supermercado'
           break
       }
-
       if(l.tipo == 1) {
         tipo = '<span style="color: green">Entrada</span>'
       } else {
@@ -179,7 +188,6 @@
       let valor = l.valor.toFixed(2).toString()
       valor = valor.replace(".", ",")
       
-
       tab += `<tr> 
         <td>${l.id}</td>
         <td>${l.titulo}</td>
@@ -203,16 +211,27 @@
       } else {
         saida += parseFloat(l.valor)
       }
-
     }
-
     tab += `</tbody>`
-
     document.getElementById("table").innerHTML = tab
     document.getElementById("entrada").innerHTML = 'R$ ' + entrada.toFixed(2).replace(".", ",")
     document.getElementById("saida").innerHTML = 'R$ ' + saida.toFixed(2).replace(".", ",")
     document.getElementById("total").innerHTML = 'R$ ' + (entrada-saida).toFixed(2).replace(".", ",")
     pesquisarTransacao()
+  }
+
+  async function getNameCategoria(id) {
+    return promise = new Promise(function(resolve, reject) {
+      request.open("GET",`http://localhost:3000/categoria/${id}`)
+      request.send();
+      request.onload  = () => {
+        if(request.status === 200){
+          let response = JSON.parse(request.response)[0]  
+          resolve(response.titulo);
+        }
+      }
+    })
+    
   }
 
   function saveTransaction() {
@@ -262,7 +281,6 @@
         tipo = 2;
       }
 
-
       valor = valor.replace(".", "")
       valor = valor.replace(",", ".")
       valor = valor.replace("R$", "")
@@ -271,7 +289,7 @@
       const params = {
         titulo: titulo,
         valor: valor,
-        categoria: categoria,
+        categoria_id: categoria,
         tipo: tipo,
         data: data,
         hora: hora
@@ -349,7 +367,7 @@
         document.getElementById('id').value = response.id
         document.getElementById('titulo').value = response.titulo
         document.getElementById('valor').value = `R$ ${response.valor.toFixed(2).replace(".", ",")}`
-        document.getElementById('categoria').value = response.categoria
+        document.getElementById('categoria').value = response.categoria_id
         document.getElementById('data').value = response.datacao
         document.getElementById('hora').value = response.hora
         
@@ -382,7 +400,6 @@
   filtro.addEventListener("keyup", pesquisarTransacao);
   
   function pesquisarTransacao() {
-    console.log('entrou')
       let nomeFiltro = filtro.value;
       for (var i = 1; i < tabela.rows.length; i++) {
           var conteudoCelula = tabela.rows[i].cells[1].innerText;
