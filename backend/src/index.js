@@ -1,6 +1,9 @@
 const express = require('express');
 const mysql = require('mysql2/promise');
-const cors = require('cors')
+const cors = require('cors');
+const jwt = require('jsonwebtoken');
+
+const SECRET = 'inter'
 
 const app = express();
 app.use(express.json());
@@ -9,7 +12,7 @@ app.use(cors());
 async function getConnection() {
     const connection = await mysql.createConnection({
         host: 'localhost',
-        user: 'root',
+        user: 'vinicius',
         password: 'root',
         database: 'transactions'
     });
@@ -24,13 +27,29 @@ async function query(sql = '', values = []) {
     return result[0];
 }
 
-app.post("/transacao", async (req, res) => {
+function verifyJWT(req, res, next) {
+    const token = req.headers['x-access-token'];
+
+    jwt.verify(token, SECRET, (err, decoded) => {
+        if(err){
+            return res.status(401).json({message: "token inválido ou user não logado"})
+        }else{
+            req.userId = decoded.userId;
+            next();
+        }
+    });
+
+}
+
+app.post("/transacao", verifyJWT, async (req, res) => {
 
     const { titulo, valor, categoria_id, tipo, data, hora } = req.body;
 
+    console.log(req.userId)
+
     try {
 
-        if (titulo && valor && categoria_id && tipo && data) {
+        if (titulo && valor && categoria_id && tipo && data && hora) {
             const sql = "insert into transactions(titulo, valor, categoria_id, tipo, datacao, hora) values (?, ?, ?, ?, ?, ?)";
             const valores = [titulo, valor, categoria_id, tipo, data, hora]
             await query(sql, valores)
@@ -46,7 +65,7 @@ app.post("/transacao", async (req, res) => {
 
 })
 
-app.post("/contato", async (req, res) => {
+app.post("/contato", verifyJWT, async (req, res) => {
 
     const { nome, email, message } = req.body;
 
@@ -68,28 +87,64 @@ app.post("/contato", async (req, res) => {
 
 })
 
-app.get('/transacao', async (req, res) => {
+app.post('/login', async(req, res) => {
+
+    const { user, password } = req.body;
+
+    try {
+
+        if (user && password) {
+            const sql = "select * from usuarios where usuario = ? and senha = ?";
+            const valores = [user, password]
+            const login = await query(sql, valores)
+
+            if(login.length > 0){
+
+                const token = jwt.sign({userId: login[0].id}, SECRET, {expiresIn: 3600})
+
+                return res.json({auth: true, token})
+
+            }else {
+
+                console.log("erro")
+
+            }
+            
+
+            res.status(201).json({ message: "Cadastrado com sucesso" })
+        } else {
+            res.status(400).json({ message: "Dados incompletos" })
+        }
+
+
+    } catch (err) {
+        res.status(400).json({ message: err })
+    }
+
+})
+
+app.get('/transacao', verifyJWT, async (req, res) => {
 
     const transacoes = await query('SELECT * FROM transactions;')
 
     res.json(transacoes);
 })
 
-app.get('/categoria', async (req, res) => {
+app.get('/categoria', verifyJWT, async (req, res) => {
 
     const categorias = await query('SELECT * FROM categories;')
 
     res.json(categorias);
 })
 
-app.get('/categoria/:id', async (req, res) => {
+app.get('/categoria/:id', verifyJWT, async (req, res) => {
     const { id } = req.params;
     const categoria = await query('SELECT * FROM categories where id = ' + id)
 
     res.json(categoria);
 })
 
-app.get('/transacao/:id', async (req, res) => {
+app.get('/transacao/:id', verifyJWT, async (req, res) => {
     const { id } = req.params;
     const transacoes = await query('SELECT * FROM transactions where id = ' + id)
 
@@ -113,7 +168,7 @@ app.put('/transacao/:id', async (req, res) => {
     }
 })
 
-app.delete('/transacao/:id', async (req, res) => {
+app.delete('/transacao/:id', verifyJWT, async (req, res) => {
 
     const { id } = req.params;
 

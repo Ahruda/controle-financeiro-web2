@@ -10,3 +10,15 @@ insert into categories values("Casa",NULL);
 insert into categories values("Viagem",NULL);
 insert into categories values("Compras",NULL);
 insert into categories values("Supermercado",NULL);
+select * from transactions;
+select * from contact;
+
+
+use transactions;
+
+create table usuarios(usuario varchar (100) not null, senha varchar(100) not null, id integer auto_increment not null, primary key(id));
+
+insert into usuarios(usuario, senha) values ("vinicius", "123");
+insert into usuarios(usuario, senha) values ("carneiro", "456");
+
+select * from usuarios where usuario = "vinicius" and senha = "123";
