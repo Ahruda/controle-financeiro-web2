@@ -33,7 +33,7 @@
           <!-- Email input -->
           <div class="form-outline mb-4">
             <label class="form-label" for="form3Example3">E-mail</label>
-            <input type="email" id="email" class="form-control form-control-lg" />
+            <input type="text" id="usuario" class="form-control form-control-lg" />
           </div>
 
           <!-- Password input -->
@@ -53,16 +53,16 @@
     </div>
   </div>
   
-
 <script>
-  
+  localStorage.setItem('token', 'null');
+
   let request = new XMLHttpRequest()
 
   function login() {
-    let email = document.getElementById('email').value
+    let usuario = document.getElementById('usuario').value
     let senha = document.getElementById('senha').value
 
-    if(email === '') {
+    if(usuario === '') {
       Swal.fire(
         'Campo e-mail é obrigatório',
         'Preencha-o para realizar o seu login',
@@ -75,23 +75,26 @@
         'error'
       )  
     } else {
-      request.open("POST",`http://localhost:3000/contato`)
+      request.open("POST",`http://localhost:3000/login`)
       const params = {
-        nome: nome,
-        email: email,
-        senha: senha
+        user: usuario,
+        password: senha
       }
-
       request.setRequestHeader('Content-type', 'application/json')
       request.send(JSON.stringify(params)) // Make sure to stringify
       request.onload = () => {
-        if(request.status === 201) {
-          document.getElementById("form").reset();
+        if(request.status === 200) {
+          //document.getElementById("form").reset();
           Swal.fire(
             'Você foi autenticado com sucesso!',
             'Você será redirecionado para o sistema',
             'success'
           )      
+          let response = JSON.parse(request.response) 
+          localStorage.setItem('token', response.token);
+          setTimeout(function() {
+            window.location.href = "http://localhost:3001/";
+          }, 2500);
         } else {
           Swal.fire(
             'Ocorreu um erro ao realizar seu login',

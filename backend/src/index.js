@@ -12,7 +12,7 @@ app.use(cors());
 async function getConnection() {
     const connection = await mysql.createConnection({
         host: 'localhost',
-        user: 'vinicius',
+        user: 'root',
         password: 'root',
         database: 'transactions'
     });
@@ -41,11 +41,25 @@ function verifyJWT(req, res, next) {
 
 }
 
+app.post("/token", verifyJWT, async (req, res) => {
+    
+    const token = req.headers['x-access-token'];
+    
+    try {
+        if (token) {
+            res.status(200).json({ auth: true })
+        } else {
+            res.status(401).json({ message: "token indisponível" })
+        }
+
+    } catch (err) {
+        res.status(400).json({ message: err })
+    }
+})
+
 app.post("/transacao", verifyJWT, async (req, res) => {
 
     const { titulo, valor, categoria_id, tipo, data, hora } = req.body;
-
-    console.log(req.userId)
 
     try {
 
@@ -90,14 +104,14 @@ app.post("/contato", verifyJWT, async (req, res) => {
 app.post('/login', async(req, res) => {
 
     const { user, password } = req.body;
-
     try {
 
         if (user && password) {
+
             const sql = "select * from usuarios where usuario = ? and senha = ?";
             const valores = [user, password]
             const login = await query(sql, valores)
-
+            
             if(login.length > 0){
 
                 const token = jwt.sign({userId: login[0].id}, SECRET, {expiresIn: 3600})
