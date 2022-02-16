@@ -2,6 +2,7 @@ const express = require('express');
 const mysql = require('mysql2/promise');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 
 const SECRET = 'inter'
 
@@ -38,8 +39,14 @@ function verifyJWT(req, res, next) {
             next();
         }
     });
-
 }
+
+const getHashedPassword = (password) => {
+    const sha256 = crypto.createHash('sha256');
+    const hash = sha256.update(password).digest('base64');
+    return hash;
+}
+
 
 app.post("/token", verifyJWT, async (req, res) => {
     
@@ -61,11 +68,13 @@ app.post("/transacao", verifyJWT, async (req, res) => {
 
     const { titulo, valor, categoria_id, tipo, data, hora } = req.body;
 
+    const userId = req.userId;
+
     try {
 
         if (titulo && valor && categoria_id && tipo && data && hora) {
-            const sql = "insert into transactions(titulo, valor, categoria_id, tipo, datacao, hora) values (?, ?, ?, ?, ?, ?)";
-            const valores = [titulo, valor, categoria_id, tipo, data, hora]
+            const sql = "insert into transactions(titulo, valor, categoria_id, usuario_id, tipo, datacao, hora) values (?, ?, ?, ?, ?, ?)";
+            const valores = [titulo, valor, categoria_id, userId, tipo, data, hora]
             await query(sql, valores)
             res.status(201).json({ message: "Dados cadastrados com sucesso!" })
         } else {
@@ -103,13 +112,18 @@ app.post("/contato", verifyJWT, async (req, res) => {
 
 app.post('/login', async(req, res) => {
 
-    const { user, password } = req.body;
+    const { email, password } = req.body;
+
+    const novaSenha = getHashedPassword(password);
+
+    console.log(req.body)
+
     try {
 
-        if (user && password) {
+        if (email && novaSenha) {
 
-            const sql = "select * from usuarios where usuario = ? and senha = ?";
-            const valores = [user, password]
+            const sql = "select * from usuarios where email = ? and senha = ?";
+            const valores = [email, novaSenha]
             const login = await query(sql, valores)
             
             if(login.length > 0){
@@ -137,12 +151,46 @@ app.post('/login', async(req, res) => {
 
 })
 
+app.post("/cadastro", async (req, res) => {
+
+    const { nome, email, senha } = req.body;
+
+    const novaSenha = getHashedPassword(senha);
+
+    try {
+
+        if (nome && email && novaSenha) {
+            const sql = "insert into usuarios(usuario, email, senha ) values (?, ?, ?)";
+            const valores = [nome, email, novaSenha];
+            await query(sql, valores);
+            res.status(201).json({ message: "Cadastrado com sucesso" })
+        } else {
+            res.status(400).json({ message: "Dados incompletos" })
+        }
+
+
+    } catch (err) {
+        res.status(400).json({ message: err })
+    }
+})
+
 app.get('/transacao', verifyJWT, async (req, res) => {
 
-    const transacoes = await query('SELECT * FROM transactions;')
+    const userId = req.userId;
 
-    res.json(transacoes);
+    try {
+        const sql = 'select * FROM transactions WHERE usuario_id = ?';
+        const valores = [userId]
+
+        const transacoes = await query(sql, valores)
+
+        res.json(transacoes);
+
+    } catch (err) {
+        res.json({ message: err })
+    }
 })
+
 
 app.get('/categoria', verifyJWT, async (req, res) => {
 

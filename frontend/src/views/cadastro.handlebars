@@ -46,7 +46,7 @@
           </div>
           <div class="text-center text-lg-start mt-4 pt-2">
             <button type="button" class="btn btn-primary btn-lg"
-              style="padding-left: 2.5rem; padding-right: 2.5rem;" onclick="save()">Cadastrar</button>
+              style="padding-left: 2.5rem; padding-right: 2.5rem;" onclick='save()'>Cadastrar</button>
             <p class="small fw-bold mt-2 pt-1 mb-0">Já possui conta? <a href="/login"
                 class="link-danger">Fazer login</a></p>
           </div>
@@ -84,18 +84,18 @@
         'error'
       )  
     } else {
-      request.open("POST",`http://localhost:3000/contato`)
+      request.open("POST",`http://localhost:3000/cadastro`)
       const params = {
-        nome: nome,
-        email: email,
-        senha: senha
+        nome,
+        email,
+        senha
       }
 
       request.setRequestHeader('Content-type', 'application/json')
       request.send(JSON.stringify(params)) // Make sure to stringify
       request.onload = () => {
         if(request.status === 201) {
-          document.getElementById("form").reset();
+          document.getElementById("form")
           Swal.fire(
             'Você foi cadastrado com sucesso!',
             'Você será redirecionado para o sistema',

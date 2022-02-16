@@ -33,7 +33,7 @@
           <!-- Email input -->
           <div class="form-outline mb-4">
             <label class="form-label" for="form3Example3">E-mail</label>
-            <input type="text" id="usuario" class="form-control form-control-lg" />
+            <input type="text" id="email" class="form-control form-control-lg" />
           </div>
 
           <!-- Password input -->
@@ -59,16 +59,16 @@
   let request = new XMLHttpRequest()
 
   function login() {
-    let usuario = document.getElementById('usuario').value
-    let senha = document.getElementById('senha').value
+    let email = document.getElementById('email').value
+    let password = document.getElementById('senha').value
 
-    if(usuario === '') {
+    if(email === '') {
       Swal.fire(
         'Campo e-mail é obrigatório',
         'Preencha-o para realizar o seu login',
         'error'
       )  
-    } else if(senha === '') {
+    } else if(password === '') {
       Swal.fire(
         'Campo senha é obrigatório',
         'Preencha-o para realizar o seu login',
@@ -77,8 +77,8 @@
     } else {
       request.open("POST",`http://localhost:3000/login`)
       const params = {
-        user: usuario,
-        password: senha
+        email,
+        password
       }
       request.setRequestHeader('Content-type', 'application/json')
       request.send(JSON.stringify(params)) // Make sure to stringify
