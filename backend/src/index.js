@@ -116,8 +116,6 @@ app.post('/login', async(req, res) => {
 
     const novaSenha = getHashedPassword(password);
 
-    console.log(req.body)
-
     try {
 
         if (email && novaSenha) {
@@ -163,7 +161,23 @@ app.post("/cadastro", async (req, res) => {
             const sql = "insert into usuarios(usuario, email, senha ) values (?, ?, ?)";
             const valores = [nome, email, novaSenha];
             await query(sql, valores);
-            res.status(201).json({ message: "Cadastrado com sucesso" })
+
+            const sqlLogin = "select * from usuarios where email = ? and senha = ?";
+            const valoresLogin = [email, novaSenha]
+
+            const login = await query(sqlLogin, valoresLogin);
+
+            if(login.length > 0){
+
+                const token = jwt.sign({userId: login[0].id}, SECRET, {expiresIn: 3600})
+
+                res.status(201).json({auth: true, token})
+
+            }else {
+
+                return res.status(400).json({message: "Login negado"})
+
+            }    
         } else {
             res.status(400).json({ message: "Dados incompletos" })
         }
