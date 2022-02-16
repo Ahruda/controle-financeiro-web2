@@ -101,6 +101,11 @@
             'Você será redirecionado para o sistema',
             'success'
           )      
+          let response = JSON.parse(request.response) 
+          localStorage.setItem('token', response.token);
+          setTimeout(function() {
+            window.location.href = "http://localhost:3001/";
+          }, 2500);
         } else {
           Swal.fire(
             'Ocorreu um erro ao realizar seu cadastro',
