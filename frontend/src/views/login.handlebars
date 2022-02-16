@@ -91,6 +91,7 @@
             'success'
           )      
           let response = JSON.parse(request.response) 
+          console.log(response)
           localStorage.setItem('token', response.token);
           setTimeout(function() {
             window.location.href = "http://localhost:3001/";

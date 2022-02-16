@@ -73,7 +73,7 @@ app.post("/transacao", verifyJWT, async (req, res) => {
     try {
 
         if (titulo && valor && categoria_id && tipo && data && hora) {
-            const sql = "insert into transactions(titulo, valor, categoria_id, usuario_id, tipo, datacao, hora) values (?, ?, ?, ?, ?, ?)";
+            const sql = "insert into transactions(titulo, valor, categoria_id, usuario_id, tipo, datacao, hora) values (?, ?, ?, ?, ?, ?, ?)";
             const valores = [titulo, valor, categoria_id, userId, tipo, data, hora]
             await query(sql, valores)
             res.status(201).json({ message: "Dados cadastrados com sucesso!" })
@@ -134,7 +134,7 @@ app.post('/login', async(req, res) => {
 
             }else {
 
-                return res.json({message: "Login negado"})
+                return res.status(400).json({message: "Login negado"})
 
             }
             

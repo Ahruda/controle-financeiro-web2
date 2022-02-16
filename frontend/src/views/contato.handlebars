@@ -67,6 +67,7 @@
       )  
     } else {
       request.open("POST",`http://localhost:3000/contato`)
+      request.setRequestHeader("x-access-token", token);
       const params = {
         nome: nome,
         email: email,
